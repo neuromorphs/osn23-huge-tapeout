@@ -1,5 +1,7 @@
 import torch
 
+MNIST_INPUT_RESOLUTION = 16
+
 config = {
     'model' : 'NetFC',
 

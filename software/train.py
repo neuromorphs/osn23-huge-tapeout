@@ -23,6 +23,12 @@ import shutil
 import time
 from tqdm import tqdm
 
+# local imports
+from dataloader import *
+from test import *
+from test_acc import *
+from tha import *
+
 def train(config, net, epoch, trainloader, testloader, criterion, optimizer, scheduler, device):
     net.train()
     loss_accum = []

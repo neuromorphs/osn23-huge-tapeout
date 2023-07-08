@@ -15,6 +15,14 @@ import pandas as pd
 import time
 import logging
 
+# local imports
+from dataloader import *
+from Net import *
+from test_acc import *
+from train import *
+from earlystopping import *
+from conf import *
+
 def run(config):
     print(config)
     file_name = config['exp_name']
@@ -45,7 +53,6 @@ def run(config):
         if trial == 0:
             print(net)
         device = "cpu"
-        #device = "mps"
         if torch.cuda.is_available():
             device = "cuda:0"
             if torch.cuda.device_count() > 1:
@@ -113,8 +120,13 @@ def run(config):
                 net_quantized = post_quantize(copy.deepcopy(net))
                 test_acc_q = test_accuracy(config, net_quantized, testloader, device)
                 print(f'Epoch: {epoch} \tTest Quantized Accuracy: {test_acc_q}')
-                if (test_acc_q < test_acc * 0.5)
+                if (test_acc_q < test_acc * 0.5):
                     for name, param in net.named_parameters():
                         print(name, param)
 
         # net.load_state_dict(torch.load(model_name))
+
+
+cfg = config.copy()
+cfg['model'] = 'NetFC(config,sparsity=[0.125, 0.5])'
+run(cfg)

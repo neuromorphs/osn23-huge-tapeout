@@ -3,7 +3,8 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
-MNIST_INPUT_RESOLUTION = 16
+#local
+from conf import *
 
 def load_data(config):
         data_dir = config['data_dir']

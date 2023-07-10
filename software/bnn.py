@@ -98,13 +98,13 @@ def post_quantize(model):
     with torch.no_grad():
         for child in model.children():
             if type(child) == SparseBinaryLinear:
-                print("sfc", child)
+                #print("sfc", child)
                 child.weight = nn.Parameter(binarize(child.weight).to(child.weight.device) * child.mask.to(child.weight.device))
             if type(child) == BinaryLinear:
-                print("bfc", child)
+                #print("bfc", child)
                 child.weight = nn.Parameter(binarize(child.weight).to(child.weight.device))
             if type(child) == nn.BatchNorm1d:
-                print("qbn", child)
+                #print("qbn", child)
                 child.weight = nn.Parameter(quantize(child.weight).to(child.weight.device))
     # for n, p in model.named_parameters():
     #     print(n, p)

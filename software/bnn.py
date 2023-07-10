@@ -73,8 +73,9 @@ def binarize_activations(input):
     output[input < 0.5] = 0
     return output
 
-def quantize(input):
-    #0.5, 0.75, 1, 1.5, 2, 3, 4, 6, 8
+def quantize_bn_weights(input):
+    # 0.5, 0.75, 1, 1.5, 2, 3, 4, 6, 8
+    # can be implemented with add+shift module
     output = input.new(input.size())
     output[input < (6.0+8.0)/2] = 8
     output[input < (4.0+6.0)/2] = 6
@@ -85,12 +86,14 @@ def quantize(input):
     output[input < (1.0+1.5)/2] = 1.0
     output[input < (0.75+1.0)/2] = 0.75
     output[input < (0.5+0.75)/2] = 0.5
-    #output = input
-    #print(output)
     return output
-    #return input
-    #return torch.ones_like(input)
-    #return torch.round(torch.maximum(input, torch.ones_like(input)))
+
+def quantize_bn_bias(input):
+    output = (input * 128).round()
+    output[output <= -128] = -127
+    output[output > 128] = 128
+    output = output / 128
+    return output
 
 
 def post_quantize(model):
@@ -105,7 +108,10 @@ def post_quantize(model):
                 child.weight = nn.Parameter(binarize(child.weight).to(child.weight.device))
             if type(child) == nn.BatchNorm1d:
                 #print("qbn", child)
-                child.weight = nn.Parameter(quantize(child.weight).to(child.weight.device))
+                child.weight = nn.Parameter(quantize_bn_weights(child.weight).to(child.weight.device))
+                print(torch.min(child.bias), torch.max(child.bias))
+                child.bias = nn.Parameter(quantize_bn_bias(child.bias).to(child.bias.device))
+                print(torch.min(child.bias), torch.max(child.bias))
     # for n, p in model.named_parameters():
     #     print(n, p)
     return model

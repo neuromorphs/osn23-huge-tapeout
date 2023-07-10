@@ -51,7 +51,6 @@ end component;
 type INTERNAL is array (n_stage-1 downto 0) of STD_LOGIC_VECTOR (2*(n_stage+2)*(2**(n_stage-1)-1)-1 downto 0);
 signal s_out : INTERNAL;
 
---signal s_out: std_logic_vector(4*(2**n_stage)-1  downto 0);
 
 begin
 
@@ -63,7 +62,7 @@ begin
             adders_i:  nbit_adder generic map (n=>i+1)  
                          Port map ( A => wx(2*(i+1)*(j-1)+i downto 2*(i+1)*(j-1)), 
                                     B => wx(2*(i+1)*(j-1)+2*(i+1)-1 downto 2*(i+1)*(j-1)+i+1),
-                                    S => s_out(i-1)((i+2)*(j-1)+(i+2)-1 downto (i+2)*(j-1))); -- s_out_bits = 3*j = 3*[2**(n_stage-1)]
+                                    S => s_out(i-1)((i+2)*(j-1)+(i+2)-1 downto (i+2)*(j-1)));
         end generate;
     end generate;
     

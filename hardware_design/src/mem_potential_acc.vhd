@@ -31,12 +31,13 @@ use IEEE.NUMERIC_STD.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
--- u_out = beta*u + sum(w*x)
+-- u_out(t) = beta*u(t-1) + sum[w*x(t)] - Sout(t-1)*threshold
 
 entity mem_potential_acc is
-generic(n_stage: integer:=10);
+generic(n_stage: integer:=6);
 Port (
-    u_in,y_out : in std_logic_vector(n_stage+1 downto 0); -- y_out=sum(w*x)
+    beta_u,sum_wx, minus_teta  : in std_logic_vector(n_stage+1 downto 0); -- was_spike = 1 if at (t-1) there was a spike, 0 otherwise; minus_teta=-threshold
+    was_spike: in std_logic;
     u_out : out std_logic_vector(n_stage+1 downto 0)
      );
 end mem_potential_acc;
@@ -51,15 +52,24 @@ Port (
  );
 end component;
 
-signal s_out : std_logic_vector(n_stage+2 downto 0);
+signal s_out_1,s_out_2 : std_logic_vector(n_stage+2 downto 0);
 
 begin
 
-adders_i:  nbit_adder generic map (n=>n_stage+2)  
-                         Port map ( A => u_in, 
-                                    B => y_out,
-                                    S => s_out);
+-- Adder1 = beta*u(t-1) + sum[w*x(t)] 
+Adder_1:  nbit_adder generic map (n=>n_stage+2)  
+                         Port map ( A => beta_u, 
+                                    B => sum_wx,
+                                    S => s_out_1);
                                     
-u_out<=s_out(n_stage+1 downto 0);                                    
+-- Adder2 = beta*u(t-1) + sum[w*x(t)] + minus_teta
+Adder_2:  nbit_adder generic map (n=>n_stage+2)  
+                         Port map ( A => s_out_1(n_stage+1 downto 0), 
+                                    B => minus_teta,
+                                    S => s_out_2);
+                                                                       
+                                    
+u_out<= s_out_1(n_stage+1 downto 0) when was_spike='1' else
+        s_out_2(n_stage+1 downto 0);                                    
 
 end Behavioral;

@@ -87,8 +87,21 @@ signal previus_u, u_out : std_logic_vector(n_stage+1 downto 0);
 
 begin
 
-neuron_uut: neuron generic map (n_stage)
-Port map ( w,x,shift,previus_u,minus_teta,was_spike,BN_factor,BN_addend,u_out,is_spike); 
+neuron_uut: neuron generic map(n_stage => n_stage)
+Port map( w => w,
+       x => x,
+       shift => shift,
+       previus_u => previus_u,
+       minus_teta => minus_teta,
+       was_spike => was_spike,
+       BN_factor => BN_factor,
+       BN_addend => BN_addend,
+       u_out => u_out,
+       is_spike => is_spike
+       ); 
+
+
+
 
 is_spike_FF: reg_1b Port map( d => is_spike,
            clk => clk, 

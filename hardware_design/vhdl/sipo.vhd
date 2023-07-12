@@ -33,17 +33,13 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 
 entity SIPO is
-    Generic (N : integer := 16;
-             M: integer := 16);
-    Port ( SERIAL_IN : in STD_LOGIC_VECTOR(N-1 downto 0);
+    Generic (N : integer := 4;
+             M: integer := 64);
+    Port ( serial_in : in STD_LOGIC_VECTOR(N-1 downto 0);
            clk : in STD_LOGIC;
-           rst : in STD_LOGIC;
+           rst_n : in STD_LOGIC;
            ce : in STD_LOGIC;
-           O_1 : out STD_LOGIC_VECTOR (N-1 downto 0);
-           O_2 : out STD_LOGIC_VECTOR (N-1 downto 0);
-           O_3 : out STD_LOGIC_VECTOR (N-1 downto 0);
-           O_4 : out STD_LOGIC_VECTOR (N-1 downto 0);
-           O_5 : out STD_LOGIC_VECTOR (N-1 downto 0));
+           parallel_out : out STD_LOGIC_VECTOR (M-1 downto 0));
 end SIPO;
 
 architecture Structural of SIPO is
@@ -52,24 +48,33 @@ component reg_N is
     Generic (N : integer := 16);
     Port ( d : in STD_LOGIC_VECTOR (N-1 downto 0);
            clk : in STD_LOGIC;
-           rst : in STD_LOGIC;
+           rst_n : in STD_LOGIC;
            ce : in STD_LOGIC;
            q : out STD_LOGIC_VECTOR (N-1 downto 0));
 end component;
 
-type INTERNAL_NODES is array(5 downto 0) of STD_LOGIC_VECTOR(N-1 downto 0);
-signal x : INTERNAL_NODES;
+
+signal x : STD_LOGIC_VECTOR (M-1 downto 0);
 
 begin
-    x(0)<=serial_in;
+    
     SH_REG:
-       for i in 0 to 4 generate
+       for i in 0 to M/N-1 generate
           begin
-             r : reg_N generic map (N=>N) port map (d=>x(i), clk=>clk, rst=>rst, ce=>ce, q=>x(i+1));
+          
+            first_reg:if i=0 generate
+            begin
+                 r : reg_N generic map (N=>N) port map (d=>serial_in, clk=>clk, rst_n=>rst_n, ce=>ce, q=>x(N-1 downto 0));
+            end generate;
+            
+            other_regs: if i>0 generate
+            begin
+                 r : reg_N generic map (N=>N) port map (d=>x(i*N-1 downto (i-1)*N), clk=>clk, rst_n=>rst_n, ce=>ce, q=>x((i+1)*N-1 downto i*N));
+            end generate;
+            
        end generate;
-    O_1<=x(1);
-    O_2<=x(2);
-    O_3<=x(3);
-    O_4<=x(4);
-    O_5<=x(5);
+       
+       
+   parallel_out<=x;
+       
 end Structural;

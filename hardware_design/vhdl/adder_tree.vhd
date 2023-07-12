@@ -72,6 +72,7 @@ begin
         adders: for j in 1 to (2**(n_stage-i)) generate begin
             s_in(i-2)(2*(i+1)*(j-1)+i downto 2*(i+1)*(j-1))<= s_out(i-2)(2*(i+1)*(j-1)+i-1) & s_out(i-2)(2*(i+1)*(j-1)+i-1 downto 2*(i+1)*(j-1));
             s_in(i-2)(2*(i+1)*(j-1)+2*(i+1)-1 downto 2*(i+1)*(j-1)+i+1) <= s_out(i-2)(2*(i+1)*(j-1)+2*(i+1)-2) & s_out(i-2)(2*(i+1)*(j-1)+2*(i+1)-2 downto 2*(i+1)*(j-1)+i+1);
+      
             adders_i:  nbit_adder generic map (n=>i+1)  
                          Port map ( A => s_in(i-2)(2*(i+1)*(j-1)+i downto 2*(i+1)*(j-1)),  
                                     B => s_in(i-2)(2*(i+1)*(j-1)+2*(i+1)-1 downto 2*(i+1)*(j-1)+i+1),

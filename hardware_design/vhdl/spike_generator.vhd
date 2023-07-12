@@ -59,7 +59,7 @@ Adder_1:  nbit_adder generic map (n=>n_stage+2)
                                     B => minus_teta,
                                     S => s_out);
           
-is_spike <=s_out(n_stage+2);--not (s_out(n_stage+1));
+is_spike <=not (s_out(n_stage+1));
 
 
 end Behavioral;

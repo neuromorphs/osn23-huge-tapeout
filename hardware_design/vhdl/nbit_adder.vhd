@@ -71,5 +71,7 @@ begin
         end generate;
         
     end generate;
-
+            
+    S(N)<=Cout(N-1);
+        
 end Behavioral;
